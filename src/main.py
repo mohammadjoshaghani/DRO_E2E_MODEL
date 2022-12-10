@@ -53,7 +53,7 @@ class Runner():
         portfolio_return = y[-self.EH:]@z
         sharpe_r =  portfolio_return.mean()/portfolio_return.std()
         loss = 0.5/20 * mse + 1/len(self.dataLoader) * -sharpe_r
-        return -loss, mse
+        return loss, mse
     
     def _append(self, epch, z_star, loss, mse):
         self.L.append(loss.detach().numpy())
