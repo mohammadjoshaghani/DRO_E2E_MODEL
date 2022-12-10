@@ -26,7 +26,7 @@ class Runner():
         self._init()
 
     def _init(self):
-        self._init_hyperParam(epochs=60, lr=0.1)
+        self._init_hyperParam(epochs=80, lr=0.1)
         self._init_mkdir()
         self._init_checkMode()
         self.mseLoss = torch.nn.MSELoss()
@@ -38,22 +38,22 @@ class Runner():
             for x, y in self.dataLoader:
                 x, y = x.squeeze(0), y.squeeze(0) 
                 z_star, y_hat = self.model(x, y)
-                loss, mse = self.loss(z_star, y_hat, y)
+                loss, mse, sharpe = self.loss(z_star, y_hat, y)
                 # self.optim.zero_grad()
                 loss.backward()
                 # self.optim.step()
                 self._append(epch, z_star, loss, mse)
             self.optim.step()
             self.clamp()
-            print(f'loss: {loss:.6f} \t|\t mse: {mse:.3f} \t|\t gamma: {self.model.gamma.item():.4f}')
+            print(f'loss: {loss:.6f} \t|\t mse: {mse:.3f} \t|\t Sharpe: {sharpe:.3f} \t|\t gamma: {self.model.gamma.item():.4f}')
     
     def loss(self, z, y_hat, y):
         # 0.5/20 * mse + 1/len(train) * sharpe-ratio
         mse = self.mseLoss(y_hat,y[self.n_obs:self.n_obs+self.FH,:])
         portfolio_return = y[-self.EH:]@z
-        sharpe_r =  portfolio_return.mean()/portfolio_return.std()
-        loss = 0.5/20 * mse + 1/len(self.dataLoader) * -sharpe_r
-        return loss, mse
+        sharpe_r =  -portfolio_return.mean()/portfolio_return.std()
+        loss = 0.5/20 * mse + 1/len(self.dataLoader) * sharpe_r
+        return loss, mse, sharpe_r
     
     def _append(self, epch, z_star, loss, mse):
         self.L.append(loss.detach().numpy())
