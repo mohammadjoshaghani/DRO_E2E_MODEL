@@ -45,7 +45,7 @@ class Runner():
                 self._append(epch, z_star, loss, mse)
             self.optim.step()
             self.clamp()
-            print(f'loss: {loss:.3f} \t|\t mse: {mse:.3f} \t|\t gamma: {self.model.gamma.item():.4f}')
+            print(f'loss: {loss:.6f} \t|\t mse: {mse:.3f} \t|\t gamma: {self.model.gamma.item():.4f}')
     
     def loss(self, z, y_hat, y):
         # 0.5/20 * mse + 1/len(train) * sharpe-ratio
