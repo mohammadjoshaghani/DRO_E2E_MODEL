@@ -26,7 +26,7 @@ class Runner():
         self._init()
 
     def _init(self):
-        self._init_hyperParam(1, 0.1)
+        self._init_hyperParam(epochs=10, lr=0.1)
         self._init_mkdir()
         self._init_checkMode()
         self.mseLoss = torch.nn.MSELoss()
@@ -34,18 +34,18 @@ class Runner():
     def run(self):
         self.optim = torch.optim.Adam(list(self.model.parameters()), lr=0.1)
         for epch in range(self.epochs):
-            # self.optim.zero_grad()
+            self.optim.zero_grad()
             for x, y in self.dataLoader:
                 x, y = x.squeeze(0), y.squeeze(0) 
                 z_star, y_hat = self.model(x, y)
                 loss, mse = self.loss(z_star, y_hat, y)
-                self.optim.zero_grad()
+                # self.optim.zero_grad()
                 loss.backward()
-                self.optim.step()
+                # self.optim.step()
                 self._append(epch, z_star, loss, mse)
-                print(f'loss: {loss:.3f} \t|\t mse: {mse:.3f} \t|\t gamma: {self.model.gamma.item():.4f}')
                 self.clamp()
-            # self.optim.step()
+            self.optim.step()
+            print(f'loss: {loss:.3f} \t|\t mse: {mse:.3f} \t|\t gamma: {self.model.gamma.item():.4f}')
     
     def loss(self, z, y_hat, y):
         # 0.5/20 * mse + 1/len(train) * sharpe-ratio
@@ -115,7 +115,7 @@ runner.run()
 runner.save()
 
 print('\n #################### test phase starts: \n')
-runner.mode='test'
-runner._init_checkMode()
-runner.run()
-runner.save()
+# runner.mode='test'
+# runner._init_checkMode()
+# runner.run()
+# runner.save()

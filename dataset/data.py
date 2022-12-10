@@ -23,8 +23,8 @@ class DataSet():
         X = torch.tensor(X.values)
         Y = torch.tensor(Y.values)
 
-        X = X.unfold(0, LB+FH,1).permute(0,2,1)[:100] # batch, length, features :(1018, 105, 8)
-        Y = Y.unfold(0, LB+EH,1).permute(0,2,1)[:100] # batch, length, features :(1018, 117, 20)
+        X = X.unfold(0, LB+FH,1).permute(0,2,1) # batch, length, features :(1018, 105, 8)
+        Y = Y.unfold(0, LB+EH,1).permute(0,2,1) # batch, length, features :(1018, 117, 20)
         
         # split : train, valid, test
         l = np.cumsum([0.7, 0.1, 0.2])
