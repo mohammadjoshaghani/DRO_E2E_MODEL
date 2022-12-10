@@ -32,7 +32,7 @@ class Runner():
         self.mseLoss = torch.nn.MSELoss()
 
     def run(self):
-        self.optim = torch.optim.Adam(list(self.model.parameters()), lr=0.1)
+        self.optim = torch.optim.Adam(list(self.model.parameters()), lr=0.0125)
         for epch in range(self.epochs):
             self.optim.zero_grad()
             for x, y in self.dataLoader:
@@ -43,8 +43,8 @@ class Runner():
                 loss.backward()
                 # self.optim.step()
                 self._append(epch, z_star, loss, mse)
-                self.clamp()
             self.optim.step()
+            self.clamp()
             print(f'loss: {loss:.3f} \t|\t mse: {mse:.3f} \t|\t gamma: {self.model.gamma.item():.4f}')
     
     def loss(self, z, y_hat, y):
@@ -109,8 +109,8 @@ class Runner():
         self.model.delta.data.clamp_(0.0001)
 
 
-mode = 'train'
 runner = Runner(mode)
+mode = f'train length: {len(runner.dataLoader)}'
 runner.run()
 runner.save()
 
