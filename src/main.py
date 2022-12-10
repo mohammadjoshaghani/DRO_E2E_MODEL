@@ -26,7 +26,7 @@ class Runner():
         self._init()
 
     def _init(self):
-        self._init_hyperParam(epochs=10, lr=0.1)
+        self._init_hyperParam(epochs=60, lr=0.1)
         self._init_mkdir()
         self._init_checkMode()
         self.mseLoss = torch.nn.MSELoss()
