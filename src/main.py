@@ -108,9 +108,9 @@ class Runner():
         self.model.gamma.data.clamp_(0.0001)
         self.model.delta.data.clamp_(0.0001)
 
-
+mode ='train' 
 runner = Runner(mode)
-mode = f'train length: {len(runner.dataLoader)}'
+print(f'train length: {len(runner.dataLoader)}')
 runner.run()
 runner.save()
 
