@@ -11,6 +11,7 @@ torch.set_default_dtype(torch.float64)
 
 from dataset.data import DataSet
 from model import Model
+from logger import logger
 
 class Runner():
     def __init__(self, mode):
@@ -26,27 +27,32 @@ class Runner():
         self._init()
 
     def _init(self):
-        self._init_hyperParam(epochs=80, lr=0.1)
+        self._init_hyperParam(epochs=60, lr=0.0125)
         self._init_mkdir()
         self._init_checkMode()
         self.mseLoss = torch.nn.MSELoss()
 
     def run(self):
         self.optim = torch.optim.Adam(list(self.model.parameters()), lr=0.0125)
+        self.optim.zero_grad()
         for epch in range(self.epochs):
-            self.optim.zero_grad()
-            for x, y in self.dataLoader:
+            for idx , (x, y) in enumerate(self.dataLoader):
+                # get decisions and predictions
                 x, y = x.squeeze(0), y.squeeze(0) 
                 z_star, y_hat = self.model(x, y)
-                loss, mse, sharpe = self.loss(z_star, y_hat, y)
-                # self.optim.zero_grad()
+                # get loss and gradients
+                loss, mse, sharpe_r = self.loss(z_star, y_hat, y)
                 loss.backward()
-                # self.optim.step()
+                # in train mode, the model learns with cumulative gradients.
+                # in test mode, we train model with previous data in test batch.
+                # we only save model-parameters in train mode.
+                if self.mode != 'train' or idx == len(self.dataLoader)-1:        
+                    self.optim.step()
+                    self.optim.zero_grad()
+                    self.clamp()
+                    self._logg(loss, mse, sharpe_r)
                 self._append(epch, z_star, loss, mse)
-            self.optim.step()
-            self.clamp()
-            print(f'loss: {loss:.6f} \t|\t mse: {mse:.3f} \t|\t Sharpe: {sharpe:.3f} \t|\t gamma: {self.model.gamma.item():.4f}')
-    
+           
     def loss(self, z, y_hat, y):
         # 0.5/20 * mse + 1/len(train) * sharpe-ratio
         mse = self.mseLoss(y_hat,y[self.n_obs:self.n_obs+self.FH,:])
@@ -54,7 +60,11 @@ class Runner():
         sharpe_r =  -portfolio_return.mean()/portfolio_return.std()
         loss = 0.5/20 * mse + 1/len(self.dataLoader) * sharpe_r
         return loss, mse, sharpe_r
-    
+ 
+    def _logg(self, loss, mse, sharpe_r):
+        srt_ = f'loss: {loss:9.6f}| mse: {mse:6.3f}| Sharpe: {sharpe_r:6.3f}| gamma: {self.model.gamma.item():7.4f}'
+        logger.info(srt_)
+     
     def _append(self, epch, z_star, loss, mse):
         self.L.append(loss.detach().numpy())
         self.MSE.append(mse.detach().numpy())
@@ -66,7 +76,7 @@ class Runner():
         self.L      =[] # task loss
         self.MSE    =[] # mse loss
     
-    def _init_hyperParam(self,epochs=1, lr=0.1):
+    def _init_hyperParam(self,epochs=1, lr=0.0125):
         self.epochs = epochs
         self.lr = lr
 
@@ -76,6 +86,7 @@ class Runner():
     def _init_mkdir(self):
         __root_path = os.getcwd()
         path = os.path.join(__root_path,'results/')
+        path += str('MlpLayer')+ '/'
         path += 'epochs_'+str(self.epochs) + '/'
         if not os.path.exists(path):
             os.makedirs(path)
@@ -87,7 +98,11 @@ class Runner():
         self._init_dataLoader()
         # reload model for valid and test phase
         if self.mode !='train':
-            self.model.load_state_dict(torch.load(self.path+'/model.pt'))
+            try:
+                self.model.load_state_dict(torch.load(self.path+'/model.pt'))
+            except:
+                raise ValueError (f"there is no trained model with providing hayper-parameters.\n\
+                    you have to train model first!")
 
     def save(self):
         self.Z = np.array(self.Z).reshape(-1,self.NAS)
@@ -108,14 +123,17 @@ class Runner():
         self.model.gamma.data.clamp_(0.0001)
         self.model.delta.data.clamp_(0.0001)
 
+
+print("start:\n")
+
 mode ='train' 
 runner = Runner(mode)
-print(f'train length: {len(runner.dataLoader)}')
 runner.run()
 runner.save()
 
-print('\n #################### test phase starts: \n')
-# runner.mode='test'
-# runner._init_checkMode()
-# runner.run()
-# runner.save()
+logger.info("####\ntest starts:\n")
+runner.mode='test'
+runner._init_checkMode()
+runner.run()
+runner.save()
+print("\n finish.")
