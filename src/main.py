@@ -15,25 +15,28 @@ from logger import logger
 
 class Runner():
     def __init__(self, mode):
-        self.mode = mode
-        self.train_gamma = True
-        self.train_delta = True
+
         self.n_obs=104   # look-back window
         self.EH = 13     # evalution ahead
         self.FH = 1      # forecast ahead
         self.NAS = 20    # number of assets
         self.data = DataSet()
-        self.model = Model(self.train_gamma, self.train_delta)
-        self._init()
+        self.mseLoss = torch.nn.MSELoss()
+        self._init(mode)
 
-    def _init(self):
-        self._init_hyperParam(epochs=20, lr=0.0125)
+    def _init(self, mode, epochs=20, lr=0.0125,
+                train_gamma = True, train_delta = True):
+
+        self.train_gamma = train_gamma
+        self.train_delta = train_delta
+        self.model = Model(self.train_gamma, self.train_delta)
+        self.mode = mode
         self._init_mkdir()
         self._init_checkMode()
-        self.mseLoss = torch.nn.MSELoss()
+        self._init_hyperParam(epochs, lr)
 
     def run(self):
-        self.optim = torch.optim.Adam(list(self.model.parameters()), lr=0.0125)
+        self.optim = torch.optim.Adam(list(self.model.parameters()), lr=self.lr)
         self.optim.zero_grad()
         for epch in range(self.epochs):
             for idx , (x, y) in enumerate(self.dataLoader):
@@ -49,7 +52,7 @@ class Runner():
                 if self.mode != 'train' or idx == len(self.dataLoader)-1:        
                     self.optim.step()
                     self.optim.zero_grad()
-                    self.clamp()
+                    self._clamp()
                     self._logg(loss, mse, sharpe_r)
                 self._append(epch, z_star, loss, mse)
            
@@ -76,9 +79,11 @@ class Runner():
         self.L      =[] # task loss
         self.MSE    =[] # mse loss
     
-    def _init_hyperParam(self,epochs=1, lr=0.0125):
+    def _init_hyperParam(self, epochs, lr):
         self.epochs = epochs
         self.lr = lr
+        if self.mode!='train':
+            self.epochs=1
 
     def _init_dataLoader(self):
         self.dataLoader = self.data.get(self.mode)
@@ -93,7 +98,8 @@ class Runner():
         self.path = path
         pass    
     
-    def _init_checkMode(self):
+    def _init_checkMode(self,mode):
+        self.mode = mode
         self._init_forSave()
         self._init_dataLoader()
         # reload model for valid and test phase
@@ -118,22 +124,24 @@ class Runner():
             # Ensure that gamma, delta > 0 after taking a descent step
             # Ensure that gamma, delta > 0 after taking a descent step
     
-    def clamp(self):
+    def _clamp(self):
         # Ensure that gamma, delta > 0 after taking a descent step
         self.model.gamma.data.clamp_(0.0001)
         self.model.delta.data.clamp_(0.0001)
 
+    def portfolio(self):
+        portfolio_return = self.z@self.y
+        portfolio_value = (1+portfolio_return)
 
-print("start:\n")
+logger.info("start:\n")
 
 mode ='train' 
 runner = Runner(mode)
-runner.run()
-runner.save()
+# runner.run()
+# runner.save()
 
-logger.info("####\ntest starts:\n")
-runner.mode='test'
-runner._init_checkMode()
-runner.run()
-runner.save()
-print("\n finish.")
+# logger.info("####\ntest starts:\n")
+# runner._init(mode='test')
+# runner.run()
+# runner.save()
+# logger.info("\n finish.")
