@@ -24,7 +24,7 @@ class Runner():
         self.mseLoss = torch.nn.MSELoss()
         self._init(mode)
 
-    def _init(self, mode, epochs=5, lr=0.0125,
+    def _init(self, mode, epochs=50, lr=0.0125,
                 train_gamma = True, train_delta = True):
         
         self.epochs = epochs
@@ -136,10 +136,10 @@ logger.info("start:\n")
 mode ='train' 
 runner = Runner(mode)
 runner.run()
-# runner.save()
+runner.save()
 
-# logger.info("####\ntest starts:\n")
-# runner._init(mode='test')
-# runner.run()
-# runner.save()
-# logger.info("\n finish.")
+logger.info("####\ntest starts:\n")
+runner._init(mode='test')
+runner.run()
+runner.save()
+logger.info("\n finish.")
