@@ -10,7 +10,7 @@ class Model(torch.nn.Module):
     def __init__(self, train_gamma, train_delta):
         super(Model, self).__init__()
         self.predLayer = MlpLayer()
-        self.decLayer = DecisionLayer().Declayer
+        self.decLayer = DecisionLayer('Hellinger_distance').Declayer
         self.n_obs=104
         self.train_gamma = train_gamma
         self.train_delta = train_delta

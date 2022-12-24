@@ -35,7 +35,8 @@ class DataSet():
         # create train data loader
         train_dataset = TensorDataset(X_train, Y_train)
         self.train_loader = DataLoader(train_dataset, batch_size=1, shuffle=False)
-
+        self.num_data = len(train_dataset)
+        
         # create validation data loader
         valid_dataset = TensorDataset(X_valid, Y_valid)
         self.valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False)

@@ -7,7 +7,18 @@ import torch
 # Hellinger distance: sum_t (sqrt(p_t) - sqrtq_t))^2 <= delta
 #---------------------------------------------------------------------------------------------------
 class DecisionLayer():
-    def __init__(self, n_y=20, n_obs=104):
+    def __init__(self, name='Hellinger_distance'):
+        """ this class creates decision layer.
+        it can use hellinger distance or kl-divergance
+        for defining ambiguity set.
+
+        Args:
+            name (str, optional): the ambiguity set diverganec metric.
+                'Hellinger_distance' or 'kl_divergance'. Defaults to 'Hellinger_distance'.
+        """
+        self.Declayer = eval('self.' + name)(n_y=20, n_obs=104)
+        
+    def Hellinger_distance(self, n_y=20, n_obs=104):
         """DRO layer using the Hellinger distance to define the probability ambiguity set.
         from Ben-Tal et al. (2013).
         Hellinger distance: sum_t (sqrt(p_t) - sqrtq_t))^2 <= delta
@@ -71,11 +82,42 @@ class DecisionLayer():
         # Construct optimization problem and differentiable layer
         problem = cp.Problem(objective, constraints)
         
-        self.Declayer = CvxpyLayer(problem, parameters=[ep, y_hat, gamma, delta], variables=[z])  
+        return CvxpyLayer(problem, parameters=[ep, y_hat, gamma, delta], variables=[z])  
     
-        ####################################################################################################
-        # Define risk functions
-        ####################################################################################################
+    def kl_divergance(self,n_y=20, n_obs=104):
+
+        # Variables
+        z = cp.Variable((n_y,1), nonneg=True)
+        c_aux = cp.Variable()
+        lambda_aux = cp.Variable(nonneg=True)
+        xi_aux = cp.Variable()
+        zz_aux = cp.Variable(n_obs)
+        mu_aux = cp.Variable()
+
+        # Parameters
+        ep = cp.Parameter((n_obs, n_y))
+        y_hat = cp.Parameter(n_y)
+        gamma = cp.Parameter(nonneg=True)
+        delta = cp.Parameter(nonneg=True)        
+
+        # Constraints
+        constraints = [cp.sum(z) == 1,
+                        mu_aux == y_hat @ z,]
+        for i in range(n_obs):
+            constraints += [self.f_lambd(lambda_aux,zz_aux[i]) <= xi_aux - self.p_var(z, c_aux, ep[i])]
+        
+        # Objective function
+        objective = cp.Minimize(xi_aux + delta * lambda_aux + (1/n_obs) * cp.sum(zz_aux) 
+                                - gamma * mu_aux)
+
+        # Construct optimization problem and differentiable layer
+        problem = cp.Problem(objective, constraints)
+        return CvxpyLayer(problem, parameters=[ep, y_hat, gamma, delta], variables=[z])
+    
+    ####################################################################################################
+    # Define risk functions
+    ####################################################################################################    
+    
     def p_var(self,z, c, x):
         """Variance
         Inputs
@@ -88,3 +130,17 @@ class DecisionLayer():
         over all scenarios 'x' to recover the complete variance
         """
         return cp.square(x @ z - c)
+    
+    ####################################################################################################
+    # Define convex conjugate of adjoint of \phi divergance
+    ####################################################################################################
+    
+    def f_lambd(self, lambda_aux,zz_aux_i):
+        """this function calculates convex conjugate of adjoint of \pi divergance
+        for kl-divergance distance.
+        """
+        return  cp.rel_entr(lambda_aux,lambda_aux+zz_aux_i)    
+
+
+if __name__ == '__main__':
+    DC = DecisionLayer('kl_divergance').Declayer        
