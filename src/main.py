@@ -12,6 +12,7 @@ torch.set_default_dtype(torch.float64)
 from dataset.data import DataSet
 from modelGP import ModelGP
 from logger import logger
+import time
 
 class Runner():
     def __init__(self, mode):
@@ -142,6 +143,7 @@ class Runner():
             torch.save(self.model.state_dict(), self.path+'/model.pt')
         # w = np.genfromtxt('w.csv',delimiter=",")
 
+s_time = time.time()
 logger.info("start:\n")
 
 mode ='train' 
@@ -153,6 +155,8 @@ logger.info("\n####\ntest starts:\n")
 runner._init(mode='test')
 runner.run()
 runner.save()
+
+logger.info(f"\n total time: {time.time()-s_time :5.2f} seconds.")
 logger.info("\n finish.")
 
 # Todo:implement some gp that has meaningfull learnable parameters.
