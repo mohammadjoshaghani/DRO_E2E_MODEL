@@ -20,7 +20,7 @@ class Runner():
 
         Args:
             mode (str): it can be: "train", "valid", "test"
-            model_name (str, optional): model architecure. it can be: "MLP", "MLP-K-GP"
+            model_name (str, optional): model architecure. it can be: "MLP", "MLP_K_GP"
             distance (str, optional): distance type in decision layer. it can be "HL", "KL"
         """
 
@@ -51,7 +51,7 @@ class Runner():
             from model_mlp import Model_MLP
             self.model = Model_MLP(self.train_gamma, self.train_delta, self.distance)
 
-        if self.model_name == "MLP-K-GP":     
+        if self.model_name == "MLP_K_GP":     
             from model_mlpKgp import Model_MLP_K_GP
             self.model = Model_MLP_K_GP(self.train_gamma, self.train_delta,
                                     self.dataLoader, self.distance)
