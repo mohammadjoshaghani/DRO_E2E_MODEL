@@ -6,7 +6,7 @@ from runner import Runner
 s_time = time.time()
 
 model   = "MLP-K-GP" #"MLP"   
-distance= "HL"       # "KL"
+distance= "KL"       # "HL"
 epochs  = 100
 
 mode ='train' 
