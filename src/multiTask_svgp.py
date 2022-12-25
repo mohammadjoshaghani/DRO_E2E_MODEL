@@ -1,20 +1,6 @@
 import torch
 import gpytorch
-
-
-
-## DEEP KERNEL
-class MlpLayer(torch.nn.Sequential):
-    """this takes input of size: 215*8 -> 215*1
-    """
-    def __init__(self, input_dim=8, out_dim=1):
-        super(MlpLayer, self).__init__()
-        midle_dim = int((out_dim+input_dim)/2)
-        self.add_module('linear1', torch.nn.Linear(input_dim, midle_dim))         
-        self.add_module('relu1', torch.nn.ReLU())
-        self.add_module('linear2', torch.nn.Linear(midle_dim, out_dim))         
-        self.add_module('relu2', torch.nn.ReLU())
-        self.add_module('linear3', torch.nn.Linear(out_dim, out_dim))
+from mlp import MlpLayer
 
 
 class MultitaskGPModel(gpytorch.models.ApproximateGP):
@@ -75,10 +61,12 @@ class DKLModel(gpytorch.Module):
         return res        
 
 
-class MainGp(torch.nn.Module):
+class MultiTask_MainGp(torch.nn.Module):
     def __init__(self, in_dim=8, out_dim=1,
                  num_tasks = 20, num_latents = 10, num_data = "", inducing_points=""):
-        super(MainGp,self).__init__()
+        super(MultiTask_MainGp,self).__init__()
+        # map 8 features to `out_dim` features. 
+        # later GP takes `out_dim` features and map it to GP.
         feature_extractor = MlpLayer(in_dim, out_dim)
         self.modelgp = DKLModel(feature_extractor, num_tasks, num_latents, inducing_points)                                # main model
         self.likelihood = gpytorch.likelihoods.MultitaskGaussianLikelihood(num_tasks=num_tasks)

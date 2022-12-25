@@ -3,24 +3,24 @@ import cvxpy as cp
 import torch
 import random
 from cvxpylayers.torch import CvxpyLayer
-from multiTask_svgp import MainGp
+from multiTask_svgp import MultiTask_MainGp
 from decisionLayer import DecisionLayer
 
-class ModelGP(torch.nn.Module):
-    def __init__(self, train_gamma, train_delta, data_loader, 
+class Model_MLP_K_GP(torch.nn.Module):
+    def __init__(self, train_gamma, train_delta, data_loader, distance='HL', 
                 num_latents = 10, num_tasks = 20, in_dim=8, out_dim=2, n_idc_points=90):
         
-        super(ModelGP, self).__init__()
+        super(Model_MLP_K_GP, self).__init__()
         # Gaussian process initialization
         num_data = len(data_loader.dataset)
         init_data, _ = next(iter(data_loader))
         idx= sorted(random.sample(range(init_data.size(1)), n_idc_points))
         inducing_points = init_data[:, idx, :out_dim]
         # creating Gaussian process 
-        self.predLayer = MainGp(in_dim, out_dim, num_tasks, num_latents, num_data, inducing_points)         
+        self.predLayer = MultiTask_MainGp(in_dim, out_dim, num_tasks, num_latents, num_data, inducing_points)         
         
         # Decision Layer initialization
-        self.decLayer = DecisionLayer('kl_divergance').Declayer
+        self.decLayer = DecisionLayer(distance).Declayer
         self.n_obs=104
         self.train_gamma = train_gamma
         self.train_delta = train_delta
@@ -48,7 +48,7 @@ class ModelGP(torch.nn.Module):
         self.delta.requires_grad = self.train_delta    
 
 
-# model = Model()
+# model = Model_MLP_K_GP()
 # for name, param in enumerate(model.named_parameters()): print(name, '->', param)
 
            

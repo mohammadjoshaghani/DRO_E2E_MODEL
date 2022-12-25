@@ -7,16 +7,17 @@ import torch
 # Hellinger distance: sum_t (sqrt(p_t) - sqrtq_t))^2 <= delta
 #---------------------------------------------------------------------------------------------------
 class DecisionLayer():
-    def __init__(self, name='Hellinger_distance'):
+    def __init__(self, distance='HL'):
         """ this class creates decision layer.
         it can use hellinger distance or kl-divergance
         for defining ambiguity set.
 
         Args:
             name (str, optional): the ambiguity set diverganec metric.
-                'Hellinger_distance' or 'kl_divergance'. Defaults to 'Hellinger_distance'.
+                'HL' for 'Hellinger_distance' or 'KL' for 'kl_divergance'. Defaults to 'HL'.
         """
-        self.Declayer = eval('self.' + name)(n_y=20, n_obs=104)
+        names={"KL":'kl_divergance', "HL":'Hellinger_distance'}
+        self.Declayer = eval('self.' + names[distance])(n_y=20, n_obs=104)
         
     def Hellinger_distance(self, n_y=20, n_obs=104):
         """DRO layer using the Hellinger distance to define the probability ambiguity set.
