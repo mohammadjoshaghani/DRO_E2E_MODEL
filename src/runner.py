@@ -87,7 +87,7 @@ class Runner():
         return loss, sharpe_r
  
     def _logg(self, loss, predLoss, sharpe_r, epch, idx):
-        srt_ = f'epochs/idx: {epch+1:3.0f}/{idx+1:4.0f}| loss: {loss:9.6f}| predLoss: {predLoss:6.3f}| Sharpe: {sharpe_r:6.3f}| gamma: {self.model.gamma.item():7.4f}'
+        srt_ = f'epochs/idx: {epch+1:3.0f}/{idx+1:4.0f}| loss: {loss:9.6f}| predLoss: {predLoss:7.3f}| Sharpe: {sharpe_r:6.3f}| gamma: {self.model.gamma.item():7.4f}'
         logger.info(srt_)
      
     def _append(self, epch, z_star, loss, predLoss):
