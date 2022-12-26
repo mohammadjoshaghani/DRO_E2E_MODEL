@@ -7,7 +7,7 @@ s_time = time.time()
 
 model   = "MLP"  #"MLP_K_GP"
 distance= "KL"   # "HL"
-epochs  = 70
+epochs  = 20
 
 mode ='train' 
 logger.info(f"\n### start {mode} phase for {model}_{distance}:\n")
