@@ -8,13 +8,13 @@ from torch.utils.data import TensorDataset, DataLoader
 
 class DataSet():
     def __init__(self):
-
-        LB = 104    # look-back window
+        batch_size = 105
+        LB = 32    # look-back window
         EH = 13     # evalution ahead
         FH = 1      # forecast ahead
         LG = 0      # time lagged between predictors and returns
 
-        X = pd.read_pickle('dataset/factor_weekly.pkl')[:-(1+LG+EH-FH)] # initial size: 1135*8
+        X = pd.read_pickle('dataset/factor_weekly.pkl')[:-(1+LG+EH)] # initial size: 1135*8
         Y = pd.read_pickle('dataset/asset_weekly.pkl')[1+LG:]           # initial size: 1135*20
 
         self.indx = Y.index
@@ -23,9 +23,12 @@ class DataSet():
         X = torch.tensor(X.values)
         Y = torch.tensor(Y.values)
 
-        X = X.unfold(0, LB+FH,1).permute(0,2,1) # batch, length, features :(1018, 105, 8)
-        Y = Y.unfold(0, LB+EH,1).permute(0,2,1) # batch, length, features :(1018, 117, 20)
+        X = X.unfold(0, LB,1).permute(0,2,1) # batch, length, features :(1090, 32, 8)
+        Y = Y.unfold(0, LB+EH,1).permute(0,2,1) # batch, length, features :(1090, 45, 20)
         
+        X = X.unfold(0, batch_size,1).permute(0,3,1,2) # 986*105*32*8
+        Y = Y.unfold(0, batch_size,1).permute(0,3,1,2) # 986*105*45*20
+
         # split : train, valid, test
         l = np.cumsum([0.7, 0.1, 0.2])
         s = list(map(lambda x: int(x*len(Y)), l))  
@@ -35,7 +38,6 @@ class DataSet():
         # create train data loader
         train_dataset = TensorDataset(X_train, Y_train)
         self.train_loader = DataLoader(train_dataset, batch_size=1, shuffle=False)
-        self.num_data = len(train_dataset)
         
         # create validation data loader
         valid_dataset = TensorDataset(X_valid, Y_valid)
@@ -53,7 +55,7 @@ class DataSet():
         elif mode =='test':
             return self.test_loader
 
-# data = DataSet()
+data = DataSet()
 # print(len(data.train_loader))
 # print(len(data.valid_loader))
 # print(len(data.test_loader))
