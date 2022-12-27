@@ -1,36 +1,33 @@
 import numpy as np
 import cvxpy as cp
-from cvxpylayers.torch import CvxpyLayer
 import torch
-
+from wavecorr import WaveCorr
 from decisionLayer import DecisionLayer
-from mlp import MlpLayer
 
-
-class Model_MLP(torch.nn.Module):
-    def __init__(self, train_gamma, train_delta, distance='HL'):
-        super(Model_MLP, self).__init__()
-        # directly maps 8 features to 20 assets returns.
-        self.predLayer = MlpLayer(input_dim=8, out_dim=20) # 105*8 -> 105*20
+class Model_WaveCorr(torch.nn.Module):
+    def __init__(self, train_gamma, train_delta, data_loader, distance='HL', 
+                num_latents = 10, num_tasks = 20, in_dim=8, out_dim=2, n_idc_points=90):
+        
+        super(Model_WaveCorr, self).__init__()
+        # creating wavecorr predictor 
+        self.predLayer = WaveCorr()         
+        
+        # Decision Layer initialization
         self.decLayer = DecisionLayer(distance).Declayer
-        self.n_obs = 104
-        self.FH = 1
+        self.n_obs=104
         self.train_gamma = train_gamma
         self.train_delta = train_delta
         self._init_param()
-        self.mseLoss = torch.nn.MSELoss()
-    
+
     def forward(self, x, y):
         # prediction Layer:
-        y_pred = self.predLayer(x)   # (105*20)
+        y_var, y_pred, gploss = self.predLayer(x,y[:self.n_obs+1,:])   # (105*20)
         y_hat =  y_pred[-1:]
-        y_eps =  y_pred[:-1]
-        eps = y[:self.n_obs,:] - y_eps         
-        mse = self.mseLoss(y_hat,y[self.n_obs:self.n_obs+self.FH,:])
-
+        eps = y_var[:-1]         
+        
         # decision Layer:
         z_star, = self.decLayer(eps, y_hat, self.gamma, self.delta)   # (1*20*1)
-        return z_star.squeeze(2), y_hat, mse      
+        return z_star.squeeze(2), y_hat, gploss      
 
     def _init_param(self):
         # Register 'gamma' (risk-return trade-off parameter)
@@ -44,7 +41,7 @@ class Model_MLP(torch.nn.Module):
         self.delta.requires_grad = self.train_delta    
 
 
-# model = Model_MLP()
+# model = Model_WaveCorr()
 # for name, param in enumerate(model.named_parameters()): print(name, '->', param)
 
-       
+           
