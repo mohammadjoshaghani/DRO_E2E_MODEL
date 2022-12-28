@@ -24,10 +24,11 @@ class Runner():
             distance (str, optional): distance type in decision layer. it can be "HL", "KL"
         """
 
-        self.n_obs=104   # look-back window
+        self.n_obs=104   # number of obsevation
         self.EH = 13     # evalution ahead
         self.FH = 1      # forecast ahead
         self.NAS = 20    # number of assets
+        self.LB = 32     # look-back window
         self.data = DataSet()
         self.model_name = model_name
         self.distance = distance
@@ -55,6 +56,9 @@ class Runner():
             from model_mlpKgp import Model_MLP_K_GP
             self.model = Model_MLP_K_GP(self.train_gamma, self.train_delta,
                                     self.dataLoader, self.distance)
+        if self.model_name == "WaveCorr":
+            from model_wavecorr import Model_WaveCorr
+            self.model = Model_WaveCorr(self.train_gamma, self.train_delta,)                           
 
     def run(self):
         self.optim = torch.optim.Adam(list(self.model.parameters()), lr=self.lr)
@@ -81,9 +85,10 @@ class Runner():
            
     def loss(self, z, y_hat, y, predLoss):
         # 0.5/20 * predLoss + 1/len(train) * sharpe-ratio
-        portfolio_return = y[-self.EH:]@z.T
-        sharpe_r =  -portfolio_return.mean()/portfolio_return.std()
-        loss = 0.5/20 * predLoss + 1/len(self.dataLoader) * sharpe_r  #! arbitrary: *0.01
+        y = y[self.n_obs:self.n_obs+1, :, -self.EH:].squeeze(0)
+        portfolio_return = z@y
+        sharpe_r =  portfolio_return.mean()/portfolio_return.std()
+        loss = 0.5/20 * predLoss + 1/len(self.dataLoader) * -sharpe_r  #! arbitrary: *0.01
         return loss, sharpe_r
  
     def _logg(self, loss, predLoss, sharpe_r, epch, idx):
@@ -141,7 +146,7 @@ class Runner():
         self.model.delta.data.clamp_(0.0001)
 
     def _portfolio(self):
-        y_true = self.dataLoader.dataset.tensors[1][:,self.n_obs:self.n_obs+self.FH,:]
+        y_true = self.dataLoader.dataset.tensors[1][:,self.n_obs:self.n_obs+self.FH,:,self.LB:self.LB+1].squeeze(3)
         z = torch.tensor(self.Z).unsqueeze(2)
         self.portfolio_return = torch.bmm(y_true,z).squeeze(2)
         portfolio_value = torch.cumprod(1+self.portfolio_return, dim=0)

@@ -5,9 +5,9 @@ from runner import Runner
 
 s_time = time.time()
 
-model   = "MLP"  #"MLP_K_GP"
-distance= "KL"   # "HL"
-epochs  = 20
+model   = "WaveCorr"  #"MLP_K_GP"
+distance= "HL"   # "KL"
+epochs  = 1
 
 mode ='train' 
 logger.info(f"\n### start {mode} phase for {model}_{distance}:\n")
@@ -22,3 +22,7 @@ runner.run()
 
 logger.info(f"\n total time: {time.time()-s_time :.2f} seconds.")
 logger.info("\n finish.")
+
+
+# Todo: drop out
+# Todo: regularization term for overfitting
