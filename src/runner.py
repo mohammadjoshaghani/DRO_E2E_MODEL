@@ -59,7 +59,11 @@ class Runner():
         if self.model_name == "WaveCorr":
             from model_wavecorr import Model_WaveCorr
             self.model = Model_WaveCorr(self.train_gamma, self.train_delta,)                           
-
+        
+        if self.model_name == "WaveCorr_Casual":
+            from model_wavecorr import Model_WaveCorr_Casual
+            self.model = Model_WaveCorr_Casual()
+    
     def run(self):
         self.optim = torch.optim.Adam(list(self.model.parameters()), lr=self.lr)
         self.optim.zero_grad()
@@ -69,7 +73,7 @@ class Runner():
                 x, y = x.squeeze(0), y.squeeze(0) 
                 z_star, y_hat, predLoss = self.model(x, y)
                 # get loss and gradients
-                loss, sharpe_r = self.loss(z_star, y_hat, y, predLoss)
+                loss, sharpe_r = self.loss(z_star, y, predLoss)
                 loss.backward()
                 # in train mode, the model learns with cumulative gradients.
                 # in test mode, we train model with previous data in test batch.
@@ -83,7 +87,7 @@ class Runner():
         # save experiment results
         _ = self.save()    
            
-    def loss(self, z, y_hat, y, predLoss):
+    def loss(self, z, y, predLoss):
         # 0.5/20 * predLoss + 1/len(train) * sharpe-ratio
         y = y[self.n_obs:self.n_obs+1, :, -self.EH:].squeeze(0)
         portfolio_return = z@y

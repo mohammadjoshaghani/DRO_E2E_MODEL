@@ -44,6 +44,24 @@ class Model_WaveCorr(torch.nn.Module):
         self.delta.requires_grad = self.train_delta    
 
 
+
+class Model_WaveCorr_Casual(torch.nn.Module):
+    def __init__(self, mtype="weights"):
+        
+        super(Model_WaveCorr_Casual, self).__init__()
+        # creating wavecorr predictor 
+        self.predLayer = WaveCorr(mtype)         
+        self.FH = 1 # forecast ahead
+        self.gamma = torch.tensor(0.0) #!
+        self.delta = torch.tensor(0.0) #!
+
+    def forward(self, x, y):
+        # only get featurs that predict 1 next step:
+        x = x[-1:]
+        z_star = self.predLayer(x)   # (1*20)
+
+        return z_star, torch.tensor(0.0), torch.tensor(0.0)      
+
 # model = Model_WaveCorr()
 # for name, param in enumerate(model.named_parameters()): print(name, '->', param)
 

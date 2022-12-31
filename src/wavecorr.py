@@ -71,10 +71,12 @@ class WaveCorr_Box(torch.nn.Module):
         self.dilated_conv1 = ConvModule_Box(i)
         self.conv_box = ConvModule_Box(i, di_operator=False)
         self.relu = torch.nn.ReLU()
+        self.dropout = torch.nn.Dropout(p=0.5)
 
     def forward(self,x):
         x_short = x #105*1*8*32 or #105*9*8*(16/8/4/2/1)
         x = self.dilated_conv1(x)#105*8*8*16
+        x = self.dropout(x)
         x = self.corrLayer(x)#105*9*8*16
         xx = self.conv_box(x_short)#!105*9*8*16
         x = x + xx #105*9*8*16
@@ -97,8 +99,9 @@ class WaveCorr(torch.nn.Module):
         self.conv_box4, self.box4 =  ConvModule(4), WaveCorr_Box(4)        
         self.conv_box5, self.box5 =  ConvModule(5), WaveCorr_Box(5)        
         self.conv_lastbox = ConvModule(5, is_f_outPut=True)
-        self.actions_layer = MlpLayer(input_dim=8, out_dim=20) 
-        self.final_layer = torch.nn.Softmax() if (mtype == "weights") else lambda x:x
+        self.actions_layer = MlpLayer(input_dim=8, out_dim=20)
+        assert mtype in ["weights", "predictions"], "mtype can be 'weights' or 'predictions'! "   
+        self.final_layer = torch.nn.Softmax(dim=2) if (mtype == "weights") else lambda x:x
     
     def forward(self,x):
         
