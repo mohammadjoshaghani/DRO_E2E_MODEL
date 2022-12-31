@@ -5,9 +5,9 @@ from runner import Runner
 
 s_time = time.time()
 
-model   = "WaveCorr_Casual" #"WaveCorr" 
-distance= "HL"   # "KL"
-epochs  = 30
+model   = "Equally_weighted" #"WaveCorr" 
+distance= ""   # "KL"
+epochs  = 20
 
 mode ='train' 
 logger.info(f"\n### start {mode} phase for {model}_{distance}:\n")

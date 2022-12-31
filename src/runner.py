@@ -52,17 +52,25 @@ class Runner():
             from model_mlp import Model_MLP
             self.model = Model_MLP(self.train_gamma, self.train_delta, self.distance)
 
-        if self.model_name == "MLP_K_GP":     
+        elif self.model_name == "MLP_K_GP":     
             from model_mlpKgp import Model_MLP_K_GP
             self.model = Model_MLP_K_GP(self.train_gamma, self.train_delta,
                                     self.dataLoader, self.distance)
-        if self.model_name == "WaveCorr":
+        elif self.model_name == "WaveCorr":
             from model_wavecorr import Model_WaveCorr
             self.model = Model_WaveCorr(self.train_gamma, self.train_delta,)                           
         
-        if self.model_name == "WaveCorr_Casual":
+        elif self.model_name == "WaveCorr_Casual":
             from model_wavecorr import Model_WaveCorr_Casual
             self.model = Model_WaveCorr_Casual()
+
+        elif self.model_name == "Equally_weighted":
+            from equally_weighted import Equally_Weighted
+            self.model = Equally_Weighted()
+            self.distance = ''
+        
+        else:
+            raise ValueError(f"\n model {self.model_name} is not implemented!.\n")
     
     def run(self):
         self.optim = torch.optim.Adam(list(self.model.parameters()), lr=self.lr)
@@ -114,6 +122,8 @@ class Runner():
         self.lr = lr
         if self.mode!='train':
             self.epochs=1
+        if self.model_name == "Equally_weighted":
+            self.epochs=1    
 
     def _init_dataLoader(self):
         self.dataLoader = self.data.get(self.mode)

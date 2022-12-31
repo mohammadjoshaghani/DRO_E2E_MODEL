@@ -55,7 +55,8 @@ class DataSet():
         elif mode =='test':
             return self.test_loader
 
-data = DataSet()
-# print(len(data.train_loader))
-# print(len(data.valid_loader))
-# print(len(data.test_loader))
+if __name__=="__main__":
+    data = DataSet()
+    # print(len(data.train_loader))
+    # print(len(data.valid_loader))
+    # print(len(data.test_loader))
