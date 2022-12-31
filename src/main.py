@@ -8,7 +8,7 @@ s_time = time.time()
 # models ={"WaveCorr", "WaveCorr_Casual", } 
 model   = "WaveCorr"    #"WaveCorr_Casual" 
 distance= "HL"   # "KL"
-epochs  = 32
+epochs  = 33
 
 mode ='train' 
 logger.info(f"\n### start {mode} phase for {model}_{distance}:\n")
