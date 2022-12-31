@@ -8,7 +8,7 @@ s_time = time.time()
 # models ={"WaveCorr", "WaveCorr_Casual", } 
 model   = "WaveCorr"    #"WaveCorr_Casual" 
 distance= "HL"   # "KL"
-epochs  = 31
+epochs  = 32
 
 mode ='train' 
 logger.info(f"\n### start {mode} phase for {model}_{distance}:\n")
@@ -27,3 +27,4 @@ logger.info("\n finish.")
 
 # Todo: regularization term for overfitting
 #! the sharp ratio in objective is different from portfolio evaluation
+#! the final portfolio sharpe ratio in CMD is different from resulst.csv
