@@ -9,11 +9,12 @@ s_time = time.time()
 model   = "WaveCorr"    #"WaveCorr_Casual" 
 distance= "HL"   # "KL"
 epochs  = 32
+weightDecay = 1e-5
 
 mode ='train' 
 logger.info(f"\n### start {mode} phase for {model}_{distance}:\n")
 
-runner = Runner(mode, epochs, model, distance)
+runner = Runner(mode, epochs, model, distance, weightDecay)
 runner.run()
 
 mode='test'

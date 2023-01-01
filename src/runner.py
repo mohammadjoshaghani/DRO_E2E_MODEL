@@ -14,7 +14,8 @@ from logger import logger
 import time
 
 class Runner():
-    def __init__(self, mode, epochs, model_name, distance):
+
+    def __init__(self, mode, epochs, model_name, distance, weightDecay):
         """it takes parameters, makes model, and run it
          for train/validation/test phases. 
 
@@ -32,6 +33,7 @@ class Runner():
         self.data = DataSet()
         self.model_name = model_name
         self.distance = distance
+        self.weightDecay = weightDecay 
         self._init(mode=mode, epochs=epochs)
 
     def _init(self, mode, epochs, lr=0.0125,
@@ -43,9 +45,9 @@ class Runner():
         self.train_delta = train_delta
         self._init_dataLoader()
         self._init_model()
+        self._init_hyperParam(lr)
         self._init_mkdir()
         self._init_checkMode()
-        self._init_hyperParam(lr)
     
     def _init_model(self):
         if self.model_name == "MLP":
@@ -68,12 +70,15 @@ class Runner():
             from equally_weighted import Equally_Weighted
             self.model = Equally_Weighted()
             self.distance = ''
+            self.epochs=1     
         
         else:
             raise ValueError(f"\n model {self.model_name} is not implemented!.\n")
     
     def run(self):
-        self.optim = torch.optim.Adam(list(self.model.parameters()), lr=self.lr, weight_decay=1e-4)
+
+        self.optim = torch.optim.Adam(list(self.model.parameters()),
+                                        lr=self.lr, weight_decay= self.weightDecay)
         self.optim.zero_grad()
         for epch in range(self.epochs):
             for idx , (x, y) in enumerate(self.dataLoader):
@@ -128,10 +133,6 @@ class Runner():
     
     def _init_hyperParam(self, lr):
         self.lr = lr
-        if self.mode!='train':
-            self.epochs=1
-        if self.model_name == "Equally_weighted":
-            self.epochs=1    
 
     def _init_dataLoader(self):
         self.dataLoader = self.data.get(self.mode)
@@ -141,7 +142,8 @@ class Runner():
         path = os.path.join(__root_path,'results/')
         path += self.model_name+ '_' 
         path += self.distance+ '/' 
-        path += 'epochs_'+str(self.epochs) + '/'
+        path += 'epochs_'+str(self.epochs) + '_'
+        path += 'wDecay_'+str(self.weightDecay) + '/'
         if not os.path.exists(path):
             os.makedirs(path)
         self.path = path
@@ -149,6 +151,8 @@ class Runner():
     
     def _init_checkMode(self):
         self._init_forSave()
+        if self.mode!='train':
+            self.epochs=1
         # reload model for valid and test phase
         if self.mode !='train':
             try:
