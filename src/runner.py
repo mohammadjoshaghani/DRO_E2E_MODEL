@@ -73,7 +73,7 @@ class Runner():
             raise ValueError(f"\n model {self.model_name} is not implemented!.\n")
     
     def run(self):
-        self.optim = torch.optim.Adam(list(self.model.parameters()), lr=self.lr, weight_decay=1e-3)
+        self.optim = torch.optim.Adam(list(self.model.parameters()), lr=self.lr, weight_decay=1e-4)
         self.optim.zero_grad()
         for epch in range(self.epochs):
             for idx , (x, y) in enumerate(self.dataLoader):
