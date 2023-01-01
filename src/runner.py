@@ -102,12 +102,12 @@ class Runner():
         sharpe_r =  portfolio_return.mean()/portfolio_return.std()       #! the sharp ratio in objective is different from portfolio evaluation
         
         #* Sharpe ratio be objective
-        loss = 0.5/20 * predLoss + 1/len(self.dataLoader) * -sharpe_r  #! arbitrary: *0.01
+        # loss = 0.5/20 * predLoss + 1/len(self.dataLoader) * -sharpe_r  #! arbitrary: *0.01
         
         #* portfolio_value be objective 
-        # prtfoli_value = torch.cumprod(1 + portfolio_return, dim=1)
-        # prtfolio_final_value = prtfoli_value[0,-1]
-        # loss = 0.5/20 * predLoss + 1/len(self.dataLoader) * -prtfolio_final_value  
+        prtfoli_value = torch.cumprod(1 + portfolio_return, dim=1)
+        prtfolio_final_value = prtfoli_value[0,-1]
+        loss = 0.5/20 * predLoss + 1/len(self.dataLoader) * -prtfolio_final_value  
 
         return loss, sharpe_r
  
