@@ -140,10 +140,11 @@ class Runner():
     def _init_mkdir(self):
         __root_path = os.getcwd()
         path = os.path.join(__root_path,'results/')
-        path += self.model_name+ '_' 
-        path += self.distance+ '/' 
-        path += 'epochs_'+str(self.epochs) + '_'
-        path += 'wDecay_'+str(self.weightDecay) + '/'
+        path += self.model_name 
+        if self.model_name != "Equally_weighted":
+            path += '_'+ self.distance+ '/' 
+            path += 'epochs_'+str(self.epochs) + '_'
+            path += 'wDecay_'+str(self.weightDecay) + '/'
         if not os.path.exists(path):
             os.makedirs(path)
         self.path = path
