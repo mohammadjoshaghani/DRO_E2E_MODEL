@@ -57,7 +57,7 @@ class Runner():
                                     self.dataLoader, self.distance)
 
     def run(self):
-        self.optim = torch.optim.Adam(list(self.model.parameters()), lr=self.lr)
+        self.optim = torch.optim.Adam(list(self.model.parameters()), lr=self.lr, weight_decay=1e-3)
         self.optim.zero_grad()
         for epch in range(self.epochs):
             for idx , (x, y) in enumerate(self.dataLoader):
@@ -81,13 +81,20 @@ class Runner():
            
     def loss(self, z, y_hat, y, predLoss):
         # 0.5/20 * predLoss + 1/len(train) * sharpe-ratio
-        portfolio_return = y[-self.EH:]@z.T
+        portfolio_return = z@y[-self.EH:].T
         sharpe_r =  -portfolio_return.mean()/portfolio_return.std()
-        loss = 0.5/20 * predLoss + 1/len(self.dataLoader) * sharpe_r  #! arbitrary: *0.01
+        
+        #* sharpe ratio be objective
+        # loss = 0.5/20 * predLoss + 1/len(self.dataLoader) * sharpe_r  #! arbitrary: *0.01
+        
+        #* portfolio value be objectiv
+        portfolio_final_value = torch.cumprod((1+portfolio_return), dim=1)[:,-1]/portfolio_return.size(1)
+        loss = 0.5/20 * predLoss + 1/len(self.dataLoader) * -portfolio_final_value  #! arbitrary: *0.01
+        
         return loss, sharpe_r
  
     def _logg(self, loss, predLoss, sharpe_r, epch, idx):
-        srt_ = f'epochs/idx: {epch+1:3.0f}/{idx+1:4.0f}| loss: {loss:9.6f}| predLoss: {predLoss:7.3f}| Sharpe: {sharpe_r:6.3f}| gamma: {self.model.gamma.item():7.4f}'
+        srt_ = f'epochs/idx: {epch+1:3.0f}/{idx+1:4.0f}| loss: {loss.item():9.6f}| predLoss: {predLoss:7.3f}| Sharpe: {sharpe_r:6.3f}| gamma: {self.model.gamma.item():7.4f}'
         logger.info(srt_)
      
     def _append(self, epch, z_star, loss, predLoss):

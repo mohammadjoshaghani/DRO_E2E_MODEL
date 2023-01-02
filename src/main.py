@@ -5,9 +5,11 @@ from runner import Runner
 
 s_time = time.time()
 
-model   = "MLP"  #"MLP_K_GP"
-distance= "KL"   # "HL"
-epochs  = 20
+# models={"MLP_K_GP", "MLP"}
+
+model   = "MLP_K_GP"
+distance= "HL"   # "HL"
+epochs  = 30
 
 mode ='train' 
 logger.info(f"\n### start {mode} phase for {model}_{distance}:\n")
