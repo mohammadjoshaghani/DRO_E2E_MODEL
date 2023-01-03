@@ -15,7 +15,7 @@ import time
 
 class Runner():
 
-    def __init__(self, mode, epochs, model_name, distance, weightDecay):
+    def __init__(self, mode, epochs, model_name, distance, weightDecay, experiment_id):
         """it takes parameters, makes model, and run it
          for train/validation/test phases. 
 
@@ -34,6 +34,7 @@ class Runner():
         self.model_name = model_name
         self.distance = distance
         self.weightDecay = weightDecay 
+        self.experiment_id = experiment_id
         self._init(mode=mode, epochs=epochs)
 
     def _init(self, mode, epochs, lr=0.0125,
@@ -144,7 +145,8 @@ class Runner():
         if self.model_name != "Equally_weighted":
             path += '_'+ self.distance+ '/' 
             path += 'epochs_'+str(self.epochs) + '_'
-            path += 'wDecay_'+str(self.weightDecay) + '/'
+            # path += 'wDecay_'+str(self.weightDecay) + '_'
+            path += 'ExpId_'+str(self.experiment_id) + '/'
         if not os.path.exists(path):
             os.makedirs(path)
         self.path = path
