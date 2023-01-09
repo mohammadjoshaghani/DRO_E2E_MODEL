@@ -75,7 +75,11 @@ class Runner():
         
         else:
             raise ValueError(f"\n model {self.model_name} is not implemented!.\n")
-    
+
+        # run on GPU if available:
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.model.to(device)
+
     def run(self):
 
         self.optim = torch.optim.Adam(list(self.model.parameters()),
