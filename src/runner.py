@@ -44,22 +44,22 @@ class Runner():
         self.epochs = epochs
         self.train_gamma = train_gamma
         self.train_delta = train_delta
-        self._init_dataLoader()
         self._init_model()
+        self._init_dataLoader()
         self._init_hyperParam(lr)
         self._init_mkdir()
         self._init_checkMode()
     
     def _init_model(self):
-        if self.model_name == "MLP":
-            from model_mlp import Model_MLP
-            self.model = Model_MLP(self.train_gamma, self.train_delta, self.distance)
+        # if self.model_name == "MLP":
+        #     from model_mlp import Model_MLP
+        #     self.model = Model_MLP(self.train_gamma, self.train_delta, self.distance)
 
-        elif self.model_name == "MLP_K_GP":     
-            from model_mlpKgp import Model_MLP_K_GP
-            self.model = Model_MLP_K_GP(self.train_gamma, self.train_delta,
-                                    self.dataLoader, self.distance)
-        elif self.model_name == "WaveCorr":
+        # elif self.model_name == "MLP_K_GP":     
+        #     from model_mlpKgp import Model_MLP_K_GP
+        #     self.model = Model_MLP_K_GP(self.train_gamma, self.train_delta,
+        #                             self.dataLoader, self.distance)
+        if self.model_name == "WaveCorr":
             from model_wavecorr import Model_WaveCorr
             self.model = Model_WaveCorr(self.train_gamma, self.train_delta,)                           
         
@@ -81,7 +81,7 @@ class Runner():
         self.optim = torch.optim.Adam(list(self.model.parameters()),
                                         lr=self.lr, weight_decay= self.weightDecay)
         self.optim.zero_grad()
-        for epch in range(self.epochs):
+        for epch in range(1):
             for idx , (x, y) in enumerate(self.dataLoader):
                 # get decisions and predictions
                 x, y = x.squeeze(0), y.squeeze(0) 
@@ -124,8 +124,8 @@ class Runner():
     def _append(self, epch, z_star, loss, predLoss):
         self.L.append(loss.detach().numpy())
         self.predLoss.append(predLoss.detach().numpy())
-        if epch == self.epochs-1:
-            self.Z.append(z_star.detach().numpy())
+        # if epch == self.epochs-1:
+        self.Z.append(z_star.detach().numpy())
 
     def _init_forSave(self):
         self.Z      =[] # portfolio_weights
@@ -141,25 +141,28 @@ class Runner():
     def _init_mkdir(self):
         __root_path = os.getcwd()
         path = os.path.join(__root_path,'results/')
+        path += 'ExpId_'+str(self.experiment_id) + '/'
         path += self.model_name 
-        if self.model_name != "Equally_weighted":
-            path += '_'+ self.distance+ '/' 
-            path += 'epochs_'+str(self.epochs) + '_'
-            # path += 'wDecay_'+str(self.weightDecay) + '_'
-            path += 'ExpId_'+str(self.experiment_id) + '/'
+        # if self.model_name != "Equally_weighted":
+        path += '_'+ self.distance+ '/' 
+        self.path_model=path+'model/'
+        path += 'epochs_'+str(self.epochs)+ '/'
+        # path += 'wDecay_'+str(self.weightDecay) + '_'
         if not os.path.exists(path):
             os.makedirs(path)
+        if not os.path.exists(self.path_model):
+            os.makedirs(self.path_model)
         self.path = path
         pass    
     
     def _init_checkMode(self):
         self._init_forSave()
-        if self.mode!='train':
-            self.epochs=1
+        # if self.mode!='train':
+        #     self.epochs=1
         # reload model for valid and test phase
-        if self.mode !='train':
+        if self.epochs != 1:
             try:
-                self.model.load_state_dict(torch.load(self.path+'/model.pt'))
+                self.model.load_state_dict(torch.load(self.path_model+f'model{self.epochs-1}.pt'))
             except:
                 raise ValueError (f"there is no trained model with providing hayper-parameters.\n\
                     you have to train model first!")
@@ -194,8 +197,8 @@ class Runner():
         np.savetxt(self.path + '/portReturns_'+str(self.mode)+'.csv', self.portfolio_return, delimiter=",")
         
         # np.save(self.path +'/Sigma_'+str(self.mode)+'.npy', self.S)
-        if self.mode =='train':
-            torch.save(self.model.state_dict(), self.path+'/model.pt')
+        if self.mode =='train' and self.model_name != "Equally_weighted":
+            torch.save(self.model.state_dict(), self.path_model+f'model{self.epochs}.pt')
         # w = np.genfromtxt('w.csv',delimiter=",")
 
 

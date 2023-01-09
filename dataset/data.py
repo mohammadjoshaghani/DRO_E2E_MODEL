@@ -14,20 +14,20 @@ class DataSet():
         FH = 1      # forecast ahead
         LG = 0      # time lagged between predictors and returns
 
-        X = pd.read_pickle('dataset/factor_weekly.pkl')[:-(1+LG+EH)] # initial size: 1135*8
-        Y = pd.read_pickle('dataset/asset_weekly.pkl')[1+LG:]           # initial size: 1135*20
+        X = pd.read_pickle('dataset/X_iran.pkl')[:-(1+LG+EH)]     # initial size: 1135*8
+        Y = pd.read_pickle('dataset/Y_iran.pkl')[1+LG:]           # initial size: 1135*20
 
-        self.indx = Y.index
+        # self.indx = Y.index
         self.assets_name = Y.columns.tolist()
 
         X = torch.tensor(X.values)
         Y = torch.tensor(Y.values)
 
-        X = X.unfold(0, LB,1).permute(0,2,1) # batch, length, features :(1090, 32, 8)
-        Y = Y.unfold(0, LB+EH,1).permute(0,2,1) # batch, length, features :(1090, 45, 20)
+        X = X.unfold(0, LB,1).permute(0,2,1) # batch, length, features :(550, 32, 20)
+        Y = Y.unfold(0, LB+EH,1).permute(0,2,1) # batch, length, features :(550, 45, 20)
         
-        X = X.unfold(0, batch_size,1).permute(0,3,2,1) # 986*105*8*32
-        Y = Y.unfold(0, batch_size,1).permute(0,3,2,1) # 986*105*20*45
+        X = X.unfold(0, batch_size,1).permute(0,3,2,1)# 986*105*8*32
+        Y = Y.unfold(0, batch_size,1).permute(0,3,2,1)# 986*105*20*45
 
         # split : train, valid, test
         l = np.cumsum([0.7, 0.1, 0.2])
@@ -57,6 +57,6 @@ class DataSet():
 
 if __name__=="__main__":
     data = DataSet()
-    # print(len(data.train_loader))
-    # print(len(data.valid_loader))
-    # print(len(data.test_loader))
+    print(len(data.train_loader))
+    print(len(data.valid_loader))
+    print(len(data.test_loader))

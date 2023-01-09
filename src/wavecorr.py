@@ -4,7 +4,7 @@ from mlp import MlpLayer
 
 
 
-def ConvModule_Box(i, di=1, di_operator=True, channel=8):
+def ConvModule_Box(i, di=1, di_operator=True, channel=20):
     """makes convolution function.
 
     Args:
@@ -31,7 +31,7 @@ def ConvModule_Box(i, di=1, di_operator=True, channel=8):
     return f
 
 
-def ConvModule(i, is_f_outPut=False, di=1, channel=8):
+def ConvModule(i, is_f_outPut=False, di=1, channel=20):
     # define convolution function
     k_size = int(32/2**(i-1))
     # first box has input_channels=1
@@ -49,9 +49,9 @@ def ConvModule(i, is_f_outPut=False, di=1, channel=8):
 class Corr_Layer(torch.nn.Module):
     def __init__(self,):
         super(Corr_Layer, self).__init__()
-        self.n_features = 8
+        self.n_features = 20
         di = 1 # dilation
-        self.conv_corr = torch.nn.Conv2d(in_channels=8, out_channels=1, kernel_size=(int(8/di)+1,1), padding='valid', dilation=di)
+        self.conv_corr = torch.nn.Conv2d(in_channels=20, out_channels=1, kernel_size=(int(20/di)+1,1), padding='valid', dilation=di)
     
     def forward(self,x): # 105*8*8*16
         stacked_out = []
@@ -99,7 +99,7 @@ class WaveCorr(torch.nn.Module):
         self.conv_box4, self.box4 =  ConvModule(4), WaveCorr_Box(4)        
         self.conv_box5, self.box5 =  ConvModule(5), WaveCorr_Box(5)        
         self.conv_lastbox = ConvModule(5, is_f_outPut=True)
-        self.actions_layer = MlpLayer(input_dim=8, out_dim=20)
+        self.actions_layer = MlpLayer(input_dim=20, out_dim=20)
         assert mtype in ["weights", "predictions"], "mtype can be 'weights' or 'predictions'! "   
         self.final_layer = torch.nn.Softmax(dim=2) if (mtype == "weights") else lambda x:x
     
@@ -131,7 +131,7 @@ class WaveCorr(torch.nn.Module):
 
 if __name__ == "__main__":
 
-    x = torch.randn(105,1,8,32)
+    x = torch.randn(105,20,32)
     model = WaveCorr()
     y = model(x)
     print(y.shape)
