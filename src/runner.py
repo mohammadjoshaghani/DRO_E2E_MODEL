@@ -75,6 +75,10 @@ class Runner():
         
         else:
             raise ValueError(f"\n model {self.model_name} is not implemented!.\n")
+        
+        # run model on GPU if availabel:
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.model.to(device)
     
     def run(self):
 
