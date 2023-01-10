@@ -96,7 +96,7 @@ class Runner():
                 # in train mode, the model learns with cumulative gradients.
                 # in test mode, we train model with previous data in test batch.
                 # we only save model-parameters in train mode.
-                if idx % 7 == 0 or idx == len(self.dataLoader)-1:        
+                if idx % 3 == 0 or idx == len(self.dataLoader)-1:        
                     self.optim.step()
                     self.optim.zero_grad()
                     self._clamp()
