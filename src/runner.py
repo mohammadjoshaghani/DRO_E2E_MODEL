@@ -126,10 +126,10 @@ class Runner():
         logger.info(srt_)
      
     def _append(self, epch, z_star, loss, predLoss):
-        self.L.append(loss.detach().numpy())
-        self.predLoss.append(predLoss.detach().numpy())
+        self.L.append(loss.detach().cpu().numpy())
+        self.predLoss.append(predLoss.detach().cpu().numpy())
         # if epch == self.epochs-1:
-        self.Z.append(z_star.detach().numpy())
+        self.Z.append(z_star.detach().cpu().numpy())
 
     def _init_forSave(self):
         self.Z      =[] # portfolio_weights
