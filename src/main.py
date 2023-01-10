@@ -9,8 +9,8 @@ s_time = time.time()
 # model   = "WaveCorr"  
 distance= "HL"   # "KL"
 epochs  = 32
-weightDecay = 1e-2
-experiment_id = "003"
+weightDecay = 1e-1
+experiment_id = "005"
 
 for model in ["WaveCorr", "WaveCorr_Casual"]:
     runner = Runner('train', 1, model, distance, weightDecay, experiment_id)
