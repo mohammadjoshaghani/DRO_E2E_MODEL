@@ -9,7 +9,7 @@ s_time = time.time()
 # model   = "WaveCorr"  
 distance= "HL"   # "KL"
 epochs  = 32
-weightDecay = 1e-3
+weightDecay = 1e-1
 experiment_id = "003"
 
 for model in ["WaveCorr", "WaveCorr_Casual"]:
