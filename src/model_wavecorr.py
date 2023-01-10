@@ -5,7 +5,7 @@ from wavecorr import WaveCorr
 from decisionLayer import DecisionLayer
 
 class Model_WaveCorr(torch.nn.Module):
-    def __init__(self, train_gamma, train_delta, 
+    def __init__(self, train_gamma, train_delta, n_obs, 
                 distance='HL', mtype="predictions"):
         
         super(Model_WaveCorr, self).__init__()
@@ -13,8 +13,8 @@ class Model_WaveCorr(torch.nn.Module):
         self.predLayer = WaveCorr(mtype)         
         
         # Decision Layer initialization
-        self.decLayer = DecisionLayer(distance).Declayer
-        self.n_obs=104
+        self.n_obs = n_obs
+        self.decLayer = DecisionLayer(distance, self.n_obs).Declayer
         self.LB = 32 # Look-back window
         self.train_gamma = train_gamma
         self.train_delta = train_delta

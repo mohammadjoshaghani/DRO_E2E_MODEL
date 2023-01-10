@@ -10,7 +10,7 @@ model   = "WaveCorr"
 distance= "HL"   # "KL"
 epochs  = 32
 weightDecay = 1e-3
-experiment_id = "001"
+experiment_id = "002"
 
 runner = Runner('train', 1, model, distance, weightDecay, experiment_id)
 for epoch in range(1, epochs+1):

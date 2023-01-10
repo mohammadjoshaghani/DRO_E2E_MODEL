@@ -7,12 +7,12 @@ from torch.utils.data import TensorDataset, DataLoader
 # torch.set_default_dtype(torch.float64)
 
 class DataSet():
-    def __init__(self):
-        batch_size = 105
-        LB = 32    # look-back window
-        EH = 13     # evalution ahead
-        FH = 1      # forecast ahead
-        LG = 0      # time lagged between predictors and returns
+    def __init__(self, n_obs):
+        batch_size = n_obs+1    # = 105 or 53 
+        LB = 32                 # look-back window
+        EH = 13                 # evalution ahead
+        FH = 1                  # forecast ahead
+        LG = 0                  # time lagged between predictors and returns
 
         X = pd.read_pickle('dataset/X_iran.pkl')[:-(1+LG+EH)]     # initial size: 1135*8
         Y = pd.read_pickle('dataset/Y_iran.pkl')[1+LG:]           # initial size: 1135*20

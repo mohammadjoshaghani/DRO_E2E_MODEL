@@ -25,12 +25,12 @@ class Runner():
             distance (str, optional): distance type in decision layer. it can be "HL", "KL"
         """
 
-        self.n_obs=104   # number of obsevation
+        self.n_obs=26   # number of obsevation
         self.EH = 13     # evalution ahead
         self.FH = 1      # forecast ahead
         self.NAS = 20    # number of assets
         self.LB = 32     # look-back window
-        self.data = DataSet()
+        self.data = DataSet(self.n_obs)
         self.model_name = model_name
         self.distance = distance
         self.weightDecay = weightDecay 
@@ -61,7 +61,7 @@ class Runner():
         #                             self.dataLoader, self.distance)
         if self.model_name == "WaveCorr":
             from model_wavecorr import Model_WaveCorr
-            self.model = Model_WaveCorr(self.train_gamma, self.train_delta,)                           
+            self.model = Model_WaveCorr(self.train_gamma, self.train_delta, self.n_obs)                           
         
         elif self.model_name == "WaveCorr_Casual":
             from model_wavecorr import Model_WaveCorr_Casual
