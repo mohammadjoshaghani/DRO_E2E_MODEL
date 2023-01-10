@@ -77,8 +77,8 @@ class Runner():
             raise ValueError(f"\n model {self.model_name} is not implemented!.\n")
         
         # run model on GPU if availabel:
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model.to(device)
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.model.to(self.device)
     
     def run(self):
 
@@ -183,7 +183,7 @@ class Runner():
 
     def _portfolio(self):
         y_true = self.dataLoader.dataset.tensors[1][:,self.n_obs:self.n_obs+self.FH,:,self.LB:self.LB+1].squeeze(3)
-        z = torch.tensor(self.Z).unsqueeze(2)
+        z = torch.tensor(self.Z).unsqueeze(2).to(self.device)
         self.portfolio_return = torch.bmm(y_true,z).squeeze(2)
         portfolio_value = torch.cumprod(1+self.portfolio_return, dim=0)
         mean_p = portfolio_value[-1]**(1/len(portfolio_value))-1
@@ -195,10 +195,10 @@ class Runner():
     def save(self):
         self._get_loop_result()
         self._portfolio()
-        np.savetxt(self.path + '/Z_'+str(self.mode)+'.csv', self.Z, delimiter=",")
+        np.savetxt(self.path + '/Z_'+str(self.mode)+'.csv', self.Z.item(), delimiter=",")
         np.savetxt(self.path + '/loss_'+str(self.mode)+'.csv', self.L, delimiter=",")
         np.savetxt(self.path + '/predLoss_'+str(self.mode)+'.csv', self.predLoss, delimiter=",")
-        np.savetxt(self.path + '/portReturns_'+str(self.mode)+'.csv', self.portfolio_return, delimiter=",")
+        np.savetxt(self.path + '/portReturns_'+str(self.mode)+'.csv', self.portfolio_return.item(), delimiter=",")
         
         # np.save(self.path +'/Sigma_'+str(self.mode)+'.npy', self.S)
         if self.mode =='train' and self.model_name != "Equally_weighted":
