@@ -10,10 +10,10 @@ s_time = time.time()
 distance= "HL"   # "KL"
 epochs  = 32
 # weightDecay = 0.2*1e-2
-experiment_id = "008"
+experiment_id = "010"
 
 for model in ["WaveCorr", "WaveCorr_Casual"]:
-    for weightDecay in [0.9*1e-2, 0.7*1e-2]:
+    for weightDecay in [0.5*1e-2]:
         weightDecay = round(weightDecay,3)
         runner = Runner('train', 1, model, distance, weightDecay, experiment_id)
         for epoch in range(1, epochs+1):
