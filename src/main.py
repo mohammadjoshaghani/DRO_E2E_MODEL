@@ -9,16 +9,18 @@ s_time = time.time()
 # model   = "WaveCorr"  
 distance= "HL"   # "KL"
 epochs  = 32
-weightDecay = 0.2*1e-2
-experiment_id = "005"
+# weightDecay = 0.2*1e-2
+experiment_id = "008"
 
 for model in ["WaveCorr", "WaveCorr_Casual"]:
-    runner = Runner('train', 1, model, distance, weightDecay, experiment_id)
-    for epoch in range(1, epochs+1):
-        for mode in ['train', 'valid', 'test']:
-            runner._init(mode, epoch)
-            logger.info(f"\n### start {mode} phase for {model}_{distance}:\n")
-            runner.run()
+    for weightDecay in [0.9*1e-2, 0.7*1e-2]:
+        weightDecay = round(weightDecay,3)
+        runner = Runner('train', 1, model, distance, weightDecay, experiment_id)
+        for epoch in range(1, epochs+1):
+            for mode in ['train', 'valid', 'test']:
+                runner._init(mode, epoch)
+                logger.info(f"\n### start {mode} phase for {model}_{distance}_WD_{weightDecay}_epoch_{epoch}:\n")
+                runner.run()
 
 logger.info(f"\n total time: {time.time()-s_time :.2f} seconds.")
 logger.info("\n finish.")

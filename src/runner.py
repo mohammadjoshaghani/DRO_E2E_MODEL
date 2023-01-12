@@ -25,7 +25,7 @@ class Runner():
             distance (str, optional): distance type in decision layer. it can be "HL", "KL"
         """
 
-        self.n_obs=26   # number of obsevation
+        self.n_obs=52   # number of obsevation
         self.EH = 13     # evalution ahead
         self.FH = 1      # forecast ahead
         self.NAS = 20    # number of assets
@@ -96,7 +96,7 @@ class Runner():
                 # in train mode, the model learns with cumulative gradients.
                 # in test mode, we train model with previous data in test batch.
                 # we only save model-parameters in train mode.
-                if idx % 7 == 0 or idx == len(self.dataLoader)-1:        
+                if idx % 3 == 0 or idx == len(self.dataLoader)-1:        
                     self.optim.step()
                     self.optim.zero_grad()
                     self._clamp()
@@ -149,9 +149,9 @@ class Runner():
         path += self.model_name 
         # if self.model_name != "Equally_weighted":
         path += '_'+ self.distance+ '/' 
+        path += 'WD_'+str(self.weightDecay) + '/'
         self.path_model=path+'model/'
         path += 'epochs_'+str(self.epochs)+ '/'
-        # path += 'wDecay_'+str(self.weightDecay) + '_'
         if not os.path.exists(path):
             os.makedirs(path)
         if not os.path.exists(self.path_model):
