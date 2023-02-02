@@ -23,7 +23,7 @@ class Optimizer:
             self.runner._init(mode, epochs)
             # logger.info(f"\n### start {mode} phase for {model}_{distance}:\n")
             self.runner.run()
-        return self.runner.portfolio_Final
+        return -self.runner.portfolio_Final
 
 
 
