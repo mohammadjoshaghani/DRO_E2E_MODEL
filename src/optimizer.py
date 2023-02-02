@@ -14,27 +14,26 @@ class Optimizer:
     def objective(self, trial):
         #the parameters to tune
         weightDecay = trial.suggest_float('weightDecay', 0.001, 0.01, step=0.003)
-        # epochs = trial.suggest_int('epochs', 10, 70, step=20)
-        epochs = trial.suggest_int('epochs', 1, 3, step=1)
+        epochs = trial.suggest_int('epochs', 10, 70, step=20)
         
         # run model
         self.runner = Runner('train', epochs, self.model, self.distance, weightDecay, self.ExpId)
         for mode in ['train', 'valid']:
             self.runner._init(mode, epochs)
-            # logger.info(f"\n### start {mode} phase for {model}_{distance}:\n")
+            logger.info(f"\n### start {mode} phase for {model}_{distance}_wd_{weightDecay}_epochs_{epochs}:\n")
             self.runner.run()
-        return -self.runner.portfolio_Final
+        return self.runner.portfolio_Final
 
 
 
     def optimize(self):
-        study = optuna.create_study(study_name=f"Optimization of {self.model}")
-        study.optimize(self.objective, n_trials = 10)
+        study = optuna.create_study(study_name=f"Optimization of {self.model}", direction='maximize')
+        study.optimize(self.objective, n_trials = 16)
         self.path = os.path.join(os.getcwd(), f'results/ExpId_{self.ExpId}/')
-        json.dump(study.best_params, open(self.path + "best_params.json", 'w'))
         logger.info('#####################')
         logger.info('best hyper-paramters:')
         logger.info(f'{study.best_params}')
+        json.dump(study.best_params, open(self.path + "best_params.json", 'w'))
         self.save_opt_plots(study)
 
 
