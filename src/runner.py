@@ -145,16 +145,19 @@ class Runner():
     def _init_mkdir(self):
         __root_path = os.getcwd()
         path = os.path.join(__root_path,'results/')
+        path += 'ExpId_'+str(self.experiment_id) + '/'
         path += self.model_name 
-        if self.model_name != "Equally_weighted":
-            path += '_'+ self.distance+ '/' 
-            path += 'epochs_'+str(self.epochs) + '_'
-            # path += 'wDecay_'+str(self.weightDecay) + '_'
-            path += 'ExpId_'+str(self.experiment_id) + '/'
+        # if self.model_name != "Equally_weighted":
+        path += '_'+ self.distance+ '/' 
+        path += 'WD_'+str(self.weightDecay) + '/'
+        # self.path_model=path+'model/'
+        path += 'epochs_'+str(self.epochs)+ '/'
         if not os.path.exists(path):
             os.makedirs(path)
+        if not os.path.exists(self.path_model):
+            os.makedirs(self.path_model)
         self.path = path
-        pass    
+        pass   
     
     def _init_checkMode(self):
         self._init_forSave()
