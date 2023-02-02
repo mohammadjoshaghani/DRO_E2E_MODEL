@@ -126,10 +126,10 @@ class Runner():
         logger.info(srt_)
      
     def _append(self, epch, z_star, loss, predLoss):
-        self.L.append(loss.detach().numpy())
-        self.predLoss.append(predLoss.detach().numpy())
+        self.L.append(loss.detach())
+        self.predLoss.append(predLoss.detach())
         if epch == self.epochs-1:
-            self.Z.append(z_star.detach().numpy())
+            self.Z.append(z_star.detach())
 
     def _init_forSave(self):
         self.Z      =[] # portfolio_weights
@@ -154,8 +154,8 @@ class Runner():
         path += 'epochs_'+str(self.epochs)+ '/'
         if not os.path.exists(path):
             os.makedirs(path)
-        if not os.path.exists(self.path_model):
-            os.makedirs(self.path_model)
+        # if not os.path.exists(self.path_model):
+        #     os.makedirs(self.path_model)
         self.path = path
         pass   
     
@@ -172,9 +172,9 @@ class Runner():
                     you have to train model first!")
 
     def _get_loop_result(self):
-        self.Z = np.array(self.Z).reshape(-1,self.NAS)
-        self.L = np.array(self.L).reshape(-1,1)
-        self.predLoss = np.array(self.predLoss).reshape(-1,1)
+        self.Z = torch.cat(self.Z, dim=0)
+        self.L = torch.stack(self.L, dim=0)
+        self.predLoss = torch.stack(self.predLoss, dim=0)
 
     def _clamp(self):
         # Ensure that gamma, delta > 0 after taking a descent step
@@ -183,14 +183,15 @@ class Runner():
 
     def _portfolio(self):
         y_true = self.dataLoader.dataset.tensors[1][:,self.n_obs:self.n_obs+self.FH,:,self.LB:self.LB+1].squeeze(3)
-        z = torch.tensor(self.Z).unsqueeze(2)
+        z = self.Z.unsqueeze(2)
         self.portfolio_return = torch.bmm(y_true,z).squeeze(2)
         portfolio_value = torch.cumprod(1+self.portfolio_return, dim=0)
         mean_p = portfolio_value[-1]**(1/len(portfolio_value))-1
         std_p = torch.std(self.portfolio_return)
         self.sharpe_ratio = mean_p/std_p
-        logger.info(f"\n portfolio sharpe-ratio: \
-            {self.sharpe_ratio.item():5.2f}")
+        self.portfolio_Final = portfolio_value[-1]
+        # logger.info(f"\n portfolio sharpe-ratio: \
+        #     {self.sharpe_ratio.item():5.2f}")
 
     def save(self):
         self._get_loop_result()
@@ -200,8 +201,7 @@ class Runner():
         np.savetxt(self.path + '/predLoss_'+str(self.mode)+'.csv', self.predLoss, delimiter=",")
         np.savetxt(self.path + '/portReturns_'+str(self.mode)+'.csv', self.portfolio_return, delimiter=",")
         
-        # np.save(self.path +'/Sigma_'+str(self.mode)+'.npy', self.S)
-        if self.mode =='train':
+        if self.mode =='train' and self.model_name != "Equally_weighted":
             torch.save(self.model.state_dict(), self.path+'/model.pt')
         # w = np.genfromtxt('w.csv',delimiter=",")
 

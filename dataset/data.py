@@ -26,8 +26,8 @@ class DataSet():
         X = X.unfold(0, LB,1).permute(0,2,1) # batch, length, features :(1090, 32, 8)
         Y = Y.unfold(0, LB+EH,1).permute(0,2,1) # batch, length, features :(1090, 45, 20)
         
-        X = X.unfold(0, batch_size,1).permute(0,3,2,1) # 986*105*8*32
-        Y = Y.unfold(0, batch_size,1).permute(0,3,2,1) # 986*105*20*45
+        X = X.unfold(0, batch_size,1).permute(0,3,2,1)[:25] # 986*105*8*32
+        Y = Y.unfold(0, batch_size,1).permute(0,3,2,1)[:25] # 986*105*20*45
 
         # split : train, valid, test
         l = np.cumsum([0.7, 0.1, 0.2])
