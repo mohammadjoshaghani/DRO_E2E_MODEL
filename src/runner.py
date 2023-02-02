@@ -196,10 +196,10 @@ class Runner():
     def save(self):
         self._get_loop_result()
         self._portfolio()
-        np.savetxt(self.path + '/Z_'+str(self.mode)+'.csv', self.Z, delimiter=",")
-        np.savetxt(self.path + '/loss_'+str(self.mode)+'.csv', self.L, delimiter=",")
-        np.savetxt(self.path + '/predLoss_'+str(self.mode)+'.csv', self.predLoss, delimiter=",")
-        np.savetxt(self.path + '/portReturns_'+str(self.mode)+'.csv', self.portfolio_return, delimiter=",")
+        np.savetxt(self.path + '/Z_'+str(self.mode)+'.csv', self.Z.cpu().numpy(), delimiter=",")
+        np.savetxt(self.path + '/loss_'+str(self.mode)+'.csv', self.L.cpu().numpy(), delimiter=",")
+        np.savetxt(self.path + '/predLoss_'+str(self.mode)+'.csv', self.predLoss.cpu().numpy(), delimiter=",")
+        np.savetxt(self.path + '/portReturns_'+str(self.mode)+'.csv', self.portfolio_return.cpu().numpy(), delimiter=",")
         
         if self.mode =='train' and self.model_name != "Equally_weighted":
             torch.save(self.model.state_dict(), self.path+'/model.pt')
