@@ -18,7 +18,7 @@ class Optimizer:
         
         # run model
         self.runner = Runner('train', epochs, self.model, self.distance, weightDecay, self.ExpId)
-        for mode in ['train', 'valid']:
+        for mode in ['train', 'test']:
             self.runner._init(mode, epochs)
             logger.info(f"\n### start {mode} phase for {model}_{distance}_wd_{weightDecay}_epochs_{epochs}:\n")
             self.runner.run()
@@ -28,7 +28,7 @@ class Optimizer:
 
     def optimize(self):
         study = optuna.create_study(study_name=f"Optimization of {self.model}", direction='maximize')
-        study.optimize(self.objective, n_trials = 16)
+        study.optimize(self.objective, n_trials = 12)
         self.path = os.path.join(os.getcwd(), f'results/ExpId_{self.ExpId}/')
         logger.info('#####################')
         logger.info('best hyper-paramters:')
@@ -55,8 +55,8 @@ logger.info("\nstart:\n")
 s_time = time.time()
 
 # models ={"WaveCorr", "WaveCorr_Casual", "Equally_weighted"} 
-model   = "WaveCorr"  
-distance= "HL"   # "KL"
+model   = "WaveCorr_Casual"  
+distance= ""   # "KL"
 ExpId = '01'
 
 h_param_optimizer = Optimizer(model, distance, ExpId)
