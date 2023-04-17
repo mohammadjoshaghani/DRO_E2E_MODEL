@@ -39,7 +39,7 @@ s_time = time.time()
 
 # models ={"WaveCorr", "WaveCorr_Casual", "Equally_weighted"} 
 model   = "WaveCorr"  
-distance= "HL"   # "KL"
+distance= "KL"   # "KL"
 ExpId = '01'
 
 optimizer = Optimizer(model, distance, ExpId)
