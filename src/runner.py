@@ -165,7 +165,7 @@ class Runner():
         if self.mode!='train':
             self.epochs=1
         # reload model for valid and test phase
-        if self.mode !='train':
+        if self.mode !='train' and self.model_name != "Equally_weighted":
             try:
                 self.model.load_state_dict(torch.load(self.path+'/model.pt'))
             except:
