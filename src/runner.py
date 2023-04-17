@@ -35,7 +35,7 @@ class Runner():
         self.distance = distance
         self.weightDecay = weightDecay 
         self.experiment_id = experiment_id
-        self._init(mode=mode, epochs=epochs)
+        # self._init(mode=mode, epochs=epochs)
 
     def _init(self, mode, epochs, lr=0.0125,
                 train_gamma = True, train_delta = True):
@@ -149,7 +149,8 @@ class Runner():
         path += self.model_name 
         # if self.model_name != "Equally_weighted":
         path += '_'+ self.distance+ '/' 
-        path += 'WD_'+str(self.weightDecay) + '/'
+        path += 'WD_'+str(self.weightDecay)+'_'
+        path += 'lr_'+str(self.lr) + '/'
         # self.path_model=path+'model/'
         path += 'epochs_'+str(self.epochs)+ '/'
         if not os.path.exists(path):
