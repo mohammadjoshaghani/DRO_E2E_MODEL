@@ -38,8 +38,8 @@ logger.info("\nstart:\n")
 s_time = time.time()
 
 # models ={"WaveCorr", "WaveCorr_Casual", "Equally_weighted"} 
-model   = "WaveCorr_Casual"  
-distance= ""   # "KL"
+model   = "WaveCorr"  
+distance= "HL"   # "KL"
 ExpId = '01'
 
 optimizer = Optimizer(model, distance, ExpId)
