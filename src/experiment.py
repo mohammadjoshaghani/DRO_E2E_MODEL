@@ -39,23 +39,23 @@ s_time = time.time()
 
 # models ={"WaveCorr", "WaveCorr_Casual", "Equally_weighted"} 
 model   = "WaveCorr"  
-distance= "KL"   # "KL"
-ExpId = '01'
+distance= "HL"   # "KL"
+ExpId = '02'
 
 optimizer = Optimizer(model, distance, ExpId)
 sweep_configs = {
-    "method": "random",
+    "method": "grid",
     "metric": {"name": "valid_loss", "goal": "minimize"},
     "parameters": {
-        "epochs": {"values": [5, 10, 15, 20]},
-        "weightDecay": {"values": [0.001, 0.003, 0.005, 0.009]},
-        "learning_rate": {"distribution": "uniform", "min": 0.0100, "max": 0.0400},
-        
+        "epochs": {"values": [5]},
+        "weightDecay": {"values": [0.001, 0.005, 0.009]},
+        # "learning_rate": {"distribution": "uniform", "min": 0.0100, "max": 0.0400},
+        "learning_rate":{"values": [0.01, 0.02, 0.03, 0.05, 0.06]},
     },
 }
 
 sweep_id = wandb.sweep(sweep_configs, project=f"{model}_{distance}_{ExpId}")
-wandb.agent(sweep_id=sweep_id, function=optimizer.objective, count=25)
+wandb.agent(sweep_id=sweep_id, function=optimizer.objective, count=15)
 
 logger.info(f"\n total time: {time.time()-s_time :.2f} seconds.")
 logger.info("\n finish.")
