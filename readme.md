@@ -3,11 +3,11 @@
 
 lets assume:
 
-![dro](assets\equation.svg)
+![eq](assets\equation.svg)
 
-![dro](assets\wavecorr.JPG)
+![wave](assets\wavecorr.JPG)
 
-![dro](assets\corr0.JPG)
+![corr](assets\corr0.JPG)
 
 
 
