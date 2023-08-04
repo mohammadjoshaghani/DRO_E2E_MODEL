@@ -1,13 +1,13 @@
-![dro](assets\dro.svg)
+![dro](assets/dro.svg)
 # Methodology
 
 lets assume:
 
-![eq](assets\equation.svg)
+![eq](assets/equation.svg)
 
-![wave](assets\wavecorr.JPG)
+![wave](assets/wavecorr.JPG)
 
-![corr](assets\corr0.JPG)
+![corr](assets/corr0.JPG)
 
 
 
