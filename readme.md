@@ -1,5 +1,5 @@
 # Master thesis repository
-The 8-page summary of the approximately 108-page original thesis can be found in [this pdf](assets\MSc_sum.pdf).
+The 8-page summary of the approximately 108-page original thesis can be found in [this pdf](assets/MSc_sum.pdf).
 
 
 ![dro](assets/dro.svg)
