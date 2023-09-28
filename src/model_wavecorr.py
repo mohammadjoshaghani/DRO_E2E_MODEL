@@ -53,8 +53,8 @@ class Model_WaveCorr_Casual(torch.nn.Module):
         # creating wavecorr predictor
         self.predLayer = WaveCorr(mtype)
         self.FH = 1  # forecast ahead
-        self.gamma = torch.nn.Parameter(torch.ones(1), requires_grad=False)  #!
-        self.delta = torch.nn.Parameter(torch.ones(1), requires_grad=False)  #!
+        self.gamma = torch.nn.Parameter(torch.ones(1), requires_grad=False)
+        self.delta = torch.nn.Parameter(torch.ones(1), requires_grad=False)
 
     def forward(self, x, y):
         # only get featurs that predict 1 next step:

@@ -5,8 +5,8 @@ import numpy as np
 class Equally_Weighted(torch.nn.Module):
     def __init__(self):
         super(Equally_Weighted, self).__init__()
-        self.gamma = torch.nn.Parameter(torch.ones(1), requires_grad=False)  #!
-        self.delta = torch.nn.Parameter(torch.ones(1), requires_grad=False)  #!
+        self.gamma = torch.nn.Parameter(torch.ones(1), requires_grad=False)
+        self.delta = torch.nn.Parameter(torch.ones(1), requires_grad=False)
         self.NAS = 20  # number of assets
         z = np.array([1.0 / self.NAS for i in range(self.NAS)])
         self.z = torch.tensor(z, requires_grad=True).unsqueeze(0)  # (1*20)
