@@ -1,13 +1,8 @@
 # Master thesis repository
-This repository hosts my master thesis codes and dataset.
+The 8-page summary of the approximately 108-page original thesis can be found in [this pdf](assets\MSc_sum.pdf).
+
 
 ![dro](assets/dro.svg)
-
----
-The 8 pages summary of the approximately 108 page original thesis can be found from [this pdf](assets\MSc_sum.pdf).
-
----
-
 ## Brief Introduction:
 This thesis discusses a data-driven decision making problem, in which the investors are
 seeking to create and protect their wealth by investing in financial institutions. Due to various
