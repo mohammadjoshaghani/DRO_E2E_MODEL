@@ -4,7 +4,7 @@ The 8-page summary of the approximately 108-page original thesis can be found in
 
 ![dro](assets/dro.svg)
 ## Brief Introduction:
-This thesis discusses a data-driven decision making problem, in which the investors are
+This thesis discusses a data-driven decision making problem, in which investors are
 seeking to create and protect their wealth by investing in financial institutions. Due to various
 factors such as economic and political conditions, financial institutions exhibit stochastic
 behavior, requiring advanced mathematical models for effectively managing risks and returns
